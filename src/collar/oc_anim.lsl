@@ -113,27 +113,7 @@ AnimMenu(key kID, integer iAuth)
   sPrompt += "\n\n[ Main > Animations ]";
   list lButtons;
 
-  if (g_bAnimLock)
-	{
-    //sPrompt += " is forbidden to change or stop poses on their own";
-  }
-	else
-	{
-    //sPrompt += " is allowed to change or stop poses on their own";
-  }
   lButtons += [Checkbox(g_bAnimLock, "AnimLock")];
-
-  if (llGetInventoryType("~stiff") == INVENTORY_ANIMATION)
-	{
-    if (g_bPosture)
-		{
-      //sPrompt += " and has their neck forced stiff.";
-    }
-		else
-		{
-      //sPrompt += " and can relax their neck.";
-    }
-  }
   lButtons += Checkbox(g_bPosture, "Posture");
   lButtons += Checkbox(g_bTweakPoseAO, "AntiSlide");
   lButtons += ["AO Menu", "AO ON", "AO OFF", "Pose"];
@@ -141,13 +121,10 @@ AnimMenu(key kID, integer iAuth)
 }
 
 PoseMenu(key kID, integer iPage, integer iAuth)
-{// Create a list
-  string sPrompt = "\n[Pose]\n\nCurrently playing: ";
+{
+  string sPrompt = "\n\n[ Main > Animations > Pose ]\n\n\tAnimation Set :\t";
 
-  if (g_sCurrentPose == "")
-  {
-    sPrompt += "-\n";
-  }
+  if (g_sCurrentPose == "") sPrompt += "" + "\n";
   else
   {
     string sActivePose = g_sCurrentPose;
@@ -201,17 +178,18 @@ PoseMenu(key kID, integer iPage, integer iAuth)
 
 PoseMoveMenu(key kID, integer iAuth)
 {
-  string sPrompt;
+  string sPrompt = "\n◼ On\n☐ Off";
+  sPrompt += "\n\n[ Main > Animations > AntiSlide ]";
   list lButtons;
 
   if (g_bTweakPoseAO)
   {
-    sPrompt += "\nThe AntiSlide tweak is enabled.";
+    sPrompt += "\n\n\t◼\tAntiSlide Feature";
     lButtons += ["OFF"];
   }
   else
   {
-    sPrompt += "\nThe AntiSlide tweak is disabled.";
+    sPrompt += "\n\n\t☐\tAntiSlide Feature";
     lButtons += ["ON"];
   }
 
@@ -219,20 +197,20 @@ PoseMoveMenu(key kID, integer iAuth)
   {
     if (g_bTweakPoseAO)
     {
-      sPrompt += "\n\nSelected Walk: " + g_sPoseMoveWalk;
+      sPrompt += "\n\n\t\tAnimation for Walk :\t" + g_sPoseMoveWalk;
       if (llGetInventoryType(g_sPoseMoveRun) == INVENTORY_ANIMATION)
       {
-        sPrompt += "\nSelected Run: " + g_sPoseMoveRun;
+        sPrompt += "\n\t\tAnimation for Run :\t" + g_sPoseMoveRun;
       }
       else
       {
-        sPrompt += "\nSelected Run: ~run";
+        sPrompt += "\n\t\tAnimation for Run :\t~run";
       }
     }
   }
   else
   {
-    sPrompt += "\n\nAntiSlide is not overriding any walk animations.";
+    sPrompt += "\n\t☐\tAnimation";
   }
   lButtons += Checkbox(bool((g_sPoseMoveWalk=="")),"none");
 
@@ -643,7 +621,7 @@ UserCommand(integer iNum, string sStr, key kID)
           g_bTweakPoseAO = TRUE;
           llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "TweakPoseAO=1" , "");
           RefreshAnim();
-          llMessageLinked(LINK_SET, NOTIFY, "1" + "AntiSlide is now enabled.", kID);
+          //llMessageLinked(LINK_SET, NOTIFY, "1" + "AntiSlide is now enabled.", kID);
         }
         else
         {
@@ -656,10 +634,10 @@ UserCommand(integer iNum, string sStr, key kID)
         llMessageLinked(LINK_SET, LM_SETTING_DELETE, g_sSettingToken + "TweakPoseAO", "");
         RefreshAnim();
 
-        if (llList2String(lParams,2) == "")
-        {
-          llMessageLinked(LINK_SET, NOTIFY, "1" + "AntiSlide is now disabled.", kID);
-        }
+        //if (llList2String(lParams,2) == "")
+        //{
+          //llMessageLinked(LINK_SET, NOTIFY, "1" + "AntiSlide is now disabled.", kID);
+        //}
       }
       else if (sValue == "none")
       {
