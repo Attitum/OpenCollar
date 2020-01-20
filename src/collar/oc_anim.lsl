@@ -527,31 +527,6 @@ UserCommand(integer iNum, string sStr, key kID)
       }
     }
   }
-  else if (sCommand == "rm" && sValue == "pose")
-  {
-    if (kID != g_kWearer || g_bAnimLock)
-    {
-      llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to delete pose", kID);
-      return;
-    }
-
-    g_sPose2Remove = llGetSubString(sStr, 8, -1);
-
-    if (llGetInventoryType(g_sPose2Remove) == INVENTORY_ANIMATION)
-    {
-      string sPrompt = "\nATTENTION: The pose that you are about to delete is not copyable! It will be removed from the %DEVICETYPE% and sent to you. Please make sure to accept the inventory.\n\nDo you really want to remove the \"" + g_sPose2Remove + "\" pose?";
-
-      if (llGetInventoryPermMask(g_sPose2Remove, MASK_OWNER) & PERM_COPY)
-      {
-        sPrompt = "\nDo you really want to remove the \"" + g_sPose2Remove + "\" pose?";
-      }
-      Dialog(g_kWearer, sPrompt, ["Yes", "No"], ["CANCEL"], 0, CMD_WEARER, "RmPose");
-    }
-    else
-    {
-      Dialog(g_kWearer, "\nWhich pose do you want to remove?\n", g_lPoseList, ["CANCEL"], 0, CMD_WEARER, "RmPoseSelect");
-    }
-  }
   else if (sCommand == "animlock")
   {
     if (sValue == "on")
