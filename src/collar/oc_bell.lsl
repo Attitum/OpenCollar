@@ -226,7 +226,7 @@ UserCommand(integer iNum, string sStr, key kID)
             llPlaySound(g_kCurrentBellSound,g_fVolume);
         }
     }
-
+}
 
 default
 {
