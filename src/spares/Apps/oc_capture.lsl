@@ -70,7 +70,7 @@ Menu(key kID, integer iAuth)
 {
     string sPrompt = "\n◼ On\n☐ Off";
     sPrompt += "\n\n[ Main > Apps > Capture ]";
-    list lButtons = [Checkbox(g_iEnabled,"Enabled"), Checkbox(g_iRisky, "Risky"), Checkbox(g_iAutoRelease, "AutoRelease")];
+    list lButtons = [Checkbox(g_iEnabled,"Enabled"), Checkbox(g_iRisky, "Risky"), Checkbox(g_iAutoRelease, "Timed")];
     Dialog(kID, sPrompt, lButtons, [UPMENU], 0, iAuth, "Menu~Main");
 }
 
@@ -295,7 +295,7 @@ default
 
                     if(sMsg == Checkbox(g_iEnabled, "Enabled")) g_iEnabled=1-g_iEnabled;
                     if(sMsg == Checkbox(g_iRisky, "Risky")) g_iRisky=1-g_iRisky;
-                    if (sMsg == Checkbox(g_iAutoRelease,"AutoRelease")) g_iAutoRelease=1-g_iAutoRelease;
+                    if (sMsg == Checkbox(g_iAutoRelease,"Timed")) g_iAutoRelease=1-g_iAutoRelease;
                     Commit();
                     if(iRespring) Menu(kAv, iAuth);
                 }
