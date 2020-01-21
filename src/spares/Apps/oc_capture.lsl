@@ -68,7 +68,8 @@ Dialog(key kID, string sPrompt, list lChoices, list lUtilityButtons, integer iPa
 
 Menu(key kID, integer iAuth)
 {
-    string sPrompt = "\n[Capture]";
+    string sPrompt = "\n◼ On\n☐ Off";
+    sPrompt += "\n\n[ Main > Apps > Capture ]";
     list lButtons = [Checkbox(g_iEnabled,"Enabled"), Checkbox(g_iRisky, "Risky"), Checkbox(g_iAutoRelease, "AutoRelease")];
     Dialog(kID, sPrompt, lButtons, [UPMENU], 0, iAuth, "Menu~Main");
 }
@@ -139,10 +140,7 @@ UserCommand(integer iNum, string sStr, key kID)
                         g_kCaptor=NULL_KEY;
                         Commit();
                     }
-                    else if(kID == g_kWearer)
-                    {
-                        llMessageLinked(LINK_SET,NOTIFY, "0%NOACCESS% you can not free yourself!", kID);
-                    }
+                    else if(kID == g_kWearer) llMessageLinked(LINK_SET,NOTIFY, "0%NOACCESS% you can not free yourself!", kID);
                     else
                     {
                         llMessageLinked(LINK_SET,NOTIFY, "0%NOACCESS% while already captured", kID);
@@ -160,10 +158,8 @@ UserCommand(integer iNum, string sStr, key kID)
                     @Retry;
                     if(g_kCaptor == NULL_KEY || g_kCaptor == "")
                     {
-                        // Check risky status
                         if(g_iRisky)
                         {
-                            // Instant capture
                             g_kCaptor=kID;
                             llMessageLinked(LINK_SET, NOTIFY, "0Successfuly captured secondlife:///app/agent/"+(string)g_kWearer+"/about", g_kCaptor);
                             g_iCaptured=TRUE;
@@ -222,6 +218,7 @@ string g_sSafeword="RED";
 Commit()
 {
     integer StatusFlags;
+
     if(g_iEnabled)StatusFlags+=1;
     if(g_iRisky)StatusFlags+=2;
     if(g_iCaptured)StatusFlags+=4; // Used in oc_auth mainly to set the captureIsActive flag
@@ -234,6 +231,7 @@ Commit()
     {
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, "auth_tempowner="+(string)g_kCaptor,"");
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, "capture_isActive=1", ""); // <--- REMOVE AFTER NEXT RELEASE. This is here only for 7.3 compatibility
+        
         if (g_iAutoRelease)
         {
             g_iReleaseTime = 0;
@@ -295,23 +293,10 @@ default
                         llMessageLinked(LINK_SET, iAuth, "menu "+g_sParentMenu, kAv);
                     }
 
-                    if(sMsg == Checkbox(g_iEnabled, "Enabled"))
-                    {
-                        g_iEnabled=1-g_iEnabled;
-                    }
-
-                    if(sMsg == Checkbox(g_iRisky, "Risky"))
-                    {
-                        g_iRisky=1-g_iRisky;
-                    }
-
-                    if (sMsg == Checkbox(g_iAutoRelease,"AutoRelease"))
-                    {
-                        g_iAutoRelease=1-g_iAutoRelease;
-                    }
-
+                    if(sMsg == Checkbox(g_iEnabled, "Enabled")) g_iEnabled=1-g_iEnabled;
+                    if(sMsg == Checkbox(g_iRisky, "Risky")) g_iRisky=1-g_iRisky;
+                    if (sMsg == Checkbox(g_iAutoRelease,"AutoRelease")) g_iAutoRelease=1-g_iAutoRelease;
                     Commit();
-
                     if(iRespring) Menu(kAv, iAuth);
                 }
                 else if(sMenu == "ConsentPrompt")
@@ -339,10 +324,7 @@ default
                 }
                 else if(sMenu == "EndPrompt")
                 {
-                    if(sMsg == "NO")
-                    {
-                        llMessageLinked(LINK_SET, NOTIFY, "0Confirmed. Not Ending Capture", g_kExpireFor);
-                    }
+                    if(sMsg == "NO") llMessageLinked(LINK_SET, NOTIFY, "0Confirmed. Not Ending Capture", g_kExpireFor);
                     else if(sMsg == "YES")
                     {
                         llMessageLinked(LINK_SET, NOTIFY, "1Capture has ended", g_kCaptor);
@@ -350,7 +332,6 @@ default
                         g_kCaptor=NULL_KEY;
                         Commit();
                     }
-
                     g_iExpire=0;
                     g_kExpireFor=NULL_KEY;
                     if (!g_iCaptured) llSetTimerEvent(0);
@@ -365,18 +346,9 @@ default
 
             if(llList2String(lSettings,0)=="global")
             {
-                if(llList2String(lSettings,1)=="locked")
-                {
-                    g_iLocked=llList2Integer(lSettings,2);
-                }
-                else if(llList2String(lSettings,1) == "safeword")
-                {
-                    g_sSafeword = llList2String(lSettings,2);
-                }
-                else if(llList2String(lSettings,1) == "checkboxes")
-                {
-                    g_lCheckboxes = llCSV2List(llList2String(lSettings,2));
-                }
+                if(llList2String(lSettings,1)=="locked") g_iLocked=llList2Integer(lSettings,2);
+                else if(llList2String(lSettings,1) == "safeword") g_sSafeword = llList2String(lSettings,2);
+                else if(llList2String(lSettings,1) == "checkboxes") g_lCheckboxes = llCSV2List(llList2String(lSettings,2));
             }
             else if(llList2String(lSettings,0) == "capture")
             {
@@ -387,16 +359,12 @@ default
                     if(Flag&2)g_iRisky=TRUE;
                     if(Flag&4)g_iCaptured=TRUE;
                     if(Flag&8)g_iAutoRelease=TRUE;
-
                     g_iFlagAtLoad=Flag;
                 }
             }
             else if(llList2String(lSettings,0) == "auth")
             {
-                if(llList2String(lSettings,1) == "tempowner")
-                {
-                    g_kCaptor = (key)llList2String(lSettings,2);
-                }
+                if(llList2String(lSettings,1) == "tempowner") g_kCaptor = (key)llList2String(lSettings,2);
             }
         }
         else if(iNum == LM_SETTING_DELETE)
@@ -441,6 +409,7 @@ default
             llMessageLinked(LINK_SET,NOTIFY, "0Timed Out.",g_kExpireFor);
             g_iExpire=0;
             g_kExpireFor="";
+
             if(g_iExpireMode==1)
             {
                 g_kCaptor=NULL_KEY;
