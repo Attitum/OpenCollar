@@ -87,10 +87,7 @@ BellMenu(key kID, integer iAuth)
         sPrompt += "\n\n\tBell Volume:  \t"+(string)((integer)(g_fVolume*10))+"/10\n";
         sPrompt += "\tActive Sound:\t"+(string)(g_iCurrentBellSound+1)+"/"+(string)g_iBellSoundCount+"\n";
     }
-    else
-    {
-        lMyButtons+= g_sBellOn;
-    }
+    else lMyButtons+= g_sBellOn;
     Dialog(kID, sPrompt, lMyButtons, [UPMENU], 0, iAuth, "BellMenu");
 }
 
@@ -141,15 +138,9 @@ BuildBellElementList()
     for (; i <= llGetNumberOfPrims(); i++)
     {
         lParams=llParseString2List((string)llGetLinkPrimitiveParams(i,[PRIM_DESC]), ["~"], []);
-        if (llList2String(lParams, 0)=="Bell")
-        {
-            g_lBellElements += [i];
-        }
-    } //Remove my menu and myself if no bell elements are found
-    if (llGetListLength(g_lBellElements))
-    {
-        g_iHasBellPrims = TRUE;
+        if (llList2String(lParams, 0)=="Bell") g_lBellElements += [i];
     }
+    if (llGetListLength(g_lBellElements)) g_iHasBellPrims = TRUE;
 }
 
 PrepareSounds()
@@ -159,10 +150,7 @@ PrepareSounds()
     for (; i < llGetInventoryNumber(INVENTORY_SOUND); i++)
     {
         sSoundName = llGetInventoryName(INVENTORY_SOUND,i);
-        if (llSubStringIndex(sSoundName,"bell_")==0)
-        {
-            g_listBellSounds+=llGetInventoryKey(sSoundName);
-        }
+        if (llSubStringIndex(sSoundName,"bell_")==0) g_listBellSounds+=llGetInventoryKey(sSoundName);
     }
     g_iBellSoundCount=llGetListLength(g_listBellSounds);
     g_iCurrentBellSound=0;
@@ -172,13 +160,13 @@ PrepareSounds()
 UserCommand(integer iNum, string sStr, key kID)
 {
     sStr = llToLower(sStr);
-    if (sStr == "menu bell" || sStr == "bell" || sStr == g_sSubMenu)
-        BellMenu(kID, iNum);
+    if (sStr == "menu bell" || sStr == "bell" || sStr == g_sSubMenu) BellMenu(kID, iNum);
     else if (llSubStringIndex(sStr,"bell")==0)
     {
         list lParams = llParseString2List(sStr, [" "], []);
         string sToken = llList2String(lParams, 1);
         string sValue = llList2String(lParams, 2);
+
         if (sToken=="volume")
         {
             integer n=(integer)sValue;
@@ -190,15 +178,9 @@ UserCommand(integer iNum, string sStr, key kID)
         }
         else if (sToken=="show" || sToken=="hide")
         {
-            if (sToken=="show")
-            {
-                g_iBellShow=TRUE;
+            if (sToken=="show") g_iBellShow=TRUE;
+            else g_iBellShow=FALSE;
 
-            }
-            else
-            {
-                g_iBellShow=FALSE;
-            }
             SetBellElementAlpha();
             llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "show=" + (string)g_iBellShow, "");
         }
@@ -265,10 +247,8 @@ default
 
     link_message(integer iSender, integer iNum, string sStr, key kID)
     {
-        if (iNum == MENUNAME_REQUEST && sStr == g_sParentMenu)
-            llMessageLinked(iSender, MENUNAME_RESPONSE, g_sParentMenu + "|" + g_sSubMenu, "");
-        else if (iNum >= CMD_OWNER && iNum <= CMD_EVERYONE)
-            UserCommand(iNum, sStr, kID);
+        if (iNum == MENUNAME_REQUEST && sStr == g_sParentMenu) llMessageLinked(iSender, MENUNAME_RESPONSE, g_sParentMenu + "|" + g_sSubMenu, "");
+        else if (iNum >= CMD_OWNER && iNum <= CMD_EVERYONE) UserCommand(iNum, sStr, kID);
         else if (iNum == DIALOG_RESPONSE)
         {
             integer iMenuIndex = llListFindList(g_lMenuIDs, [kID]);
@@ -308,8 +288,7 @@ default
                     llPlaySound(g_kCurrentBellSound,g_fVolume);
                     llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "sound=" + (string)g_iCurrentBellSound, "");
                 }
-                else if (sMessage == g_sBellOff || sMessage == g_sBellOn)
-                    UserCommand(iAuth,"bell "+llToLower(sMessage),kAV);
+                else if (sMessage == g_sBellOff || sMessage == g_sBellOn) UserCommand(iAuth,"bell "+llToLower(sMessage),kAV);
                 else if (sMessage == g_sBellShow || sMessage == g_sBellHide)
                 {
                     if (g_iHasBellPrims)
@@ -342,8 +321,7 @@ default
                 {
                     g_iBellOn=(integer)sValue;
 
-                    if (g_iBellOn && !g_iHasControl)
-                        llRequestPermissions(g_kWearer,PERMISSION_TAKE_CONTROLS);
+                    if (g_iBellOn && !g_iHasControl) llRequestPermissions(g_kWearer,PERMISSION_TAKE_CONTROLS);
                     else if (!g_iBellOn && g_iHasControl)
                     {
                         llReleaseControls();
@@ -384,10 +362,7 @@ default
     control( key kID, integer nHeld, integer nChange )
     {
         if (!g_iBellOn) return;
-        //the user is pressing a movement key
-        if (nChange & (CONTROL_LEFT|CONTROL_RIGHT|CONTROL_DOWN|CONTROL_UP|CONTROL_FWD|CONTROL_BACK))
-            llPlaySound(g_kCurrentBellSound,g_fVolume);
-        //the user is holding down a movement key and is running
+        if (nChange & (CONTROL_LEFT|CONTROL_RIGHT|CONTROL_DOWN|CONTROL_UP|CONTROL_FWD|CONTROL_BACK)) llPlaySound(g_kCurrentBellSound,g_fVolume);
         if ((nHeld & (CONTROL_FWD|CONTROL_BACK)) && (llGetAgentInfo(g_kWearer) & AGENT_ALWAYS_RUN))
         {
             if (llGetTime()>g_fNextRing)
@@ -400,8 +375,7 @@ default
 
     collision_start(integer iNum)
     {
-        if (g_iBellOn)
-            llPlaySound(g_kCurrentBellSound,g_fVolume);
+        if (g_iBellOn) llPlaySound(g_kCurrentBellSound,g_fVolume);
     }
 
     run_time_permissions(integer nParam)
@@ -431,17 +405,15 @@ default
     changed(integer iChange)
     {
         if(iChange & CHANGED_LINK) BuildBellElementList();
-        else if (iChange & CHANGED_INVENTORY)
-        {
-            PrepareSounds();
-        }
+        else if (iChange & CHANGED_INVENTORY) PrepareSounds();
+
         if (iChange & CHANGED_COLOR)
         {
             integer iNewHide=!(integer)llGetAlpha(ALL_SIDES) ; //check alpha
             if (g_iHide != iNewHide)
-            {   //check there's a difference to avoid infinite loop
+            {
                 g_iHide = iNewHide;
-                SetBellElementAlpha(); // update hide elements
+                SetBellElementAlpha();
             }
         }
         if (iChange & CHANGED_OWNER) llResetScript();
