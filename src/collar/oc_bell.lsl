@@ -74,7 +74,6 @@ Dialog(key kRCPT, string sPrompt, list lChoices, list lUtilityButtons, integer i
 BellMenu(key kID, integer iAuth)
 {
     string sPrompt = "\n[ Main > Apps > Bell ]";
-    //string sPrompt = "\n[Bell]\t"+g_sAppVersion+"\n\n";
     list lMyButtons;
 
     if (g_iBellOn>0)
@@ -188,19 +187,17 @@ UserCommand(integer iNum, string sStr, key kID)
             g_fVolume=(float)n/10;
             llPlaySound(g_kCurrentBellSound,g_fVolume);
             llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "vol=" + (string)llFloor(g_fVolume*10), "");
-            //llMessageLinked(LINK_SET,NOTIFY,"1"+"Bell volume set to "+(string)n,kID);
         }
         else if (sToken=="show" || sToken=="hide")
         {
             if (sToken=="show")
             {
                 g_iBellShow=TRUE;
-                //llMessageLinked(LINK_SET,NOTIFY,"1"+"The bell is now visible.",kID);
+
             }
             else
             {
                 g_iBellShow=FALSE;
-                //llMessageLinked(LINK_SET,NOTIFY,"1"+"The bell is now invisible.",kID);
             }
             SetBellElementAlpha();
             llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "show=" + (string)g_iBellShow, "");
@@ -214,7 +211,6 @@ UserCommand(integer iNum, string sStr, key kID)
                     g_iBellOn=iNum;
                     if (!g_iHasControl) llRequestPermissions(g_kWearer,PERMISSION_TAKE_CONTROLS);
                     llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "on=" + (string)g_iBellOn, "");
-                    //llMessageLinked(LINK_SET,NOTIFY,"1"+"The bell rings now.",kID);
                 }
             }
             else llMessageLinked(LINK_SET,NOTIFY,"0"+"%NOACCESS% to bell",kID);
@@ -230,7 +226,6 @@ UserCommand(integer iNum, string sStr, key kID)
                     g_iHasControl=FALSE;
                 }
                 llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "on=" + (string)g_iBellOn, "");
-                //llMessageLinked(LINK_SET,NOTIFY,"1"+"The bell is now quiet.",kID);
             }
             else llMessageLinked(LINK_SET,NOTIFY,"0"+"%NOACCESS% to bell",kID);
         }
@@ -249,12 +244,7 @@ UserCommand(integer iNum, string sStr, key kID)
             llPlaySound(g_kCurrentBellSound,g_fVolume);
         }
     }
-    else if (sStr == "rm bell")
-    {
-        if (kID!=g_kWearer && iNum!=CMD_OWNER) llMessageLinked(LINK_SET,NOTIFY,"0"+"%NOACCESS% to remove bell",kID);
-        else  Dialog(kID,"\nDo you really want to uninstall the "+g_sSubMenu+" App?", ["Yes","No","Cancel"], [], 0, iNum,"rmbell");
-    }
-}
+
 
 default
 {
@@ -289,7 +279,6 @@ default
                 list lMenuParams = llParseString2List(sStr, ["|"], []);
                 key kAV = llList2String(lMenuParams, 0);
                 string sMessage = llList2String(lMenuParams, 1);
-                // integer iPage = (integer)llList2String(lMenuParams, 2);
                 integer iAuth = (integer)llList2String(lMenuParams, 3);
 
                 if (sMessage == UPMENU)
@@ -331,24 +320,13 @@ default
                     }
                     else llMessageLinked(LINK_SET, NOTIFY, "0"+"[Error]\tThis %DEVICETYPE% has no visual bell element.", kAV);
                 }
-                else if (sMenuType == "rmbell")
-                {
-                    if (sMessage == "Yes")
-                    {
-                        llMessageLinked(LINK_SET, MENUNAME_REMOVE , g_sParentMenu + "|" + g_sSubMenu, "");
-                        llMessageLinked(LINK_SET, NOTIFY, "1"+g_sSubMenu+" App has been removed.", kAV);
-                        if (llGetInventoryType(llGetScriptName()) == INVENTORY_SCRIPT) llRemoveInventory(llGetScriptName());
-                    }
-                    else llMessageLinked(LINK_SET, NOTIFY, "0"+g_sSubMenu+" App remains installed.", kAV);
-                    return;
-                }
                 BellMenu(kAV, iAuth);
             }
         }
         else if (iNum == DIALOG_TIMEOUT)
         {
             integer iMenuIndex = llListFindList(g_lMenuIDs, [kID]);
-            g_lMenuIDs = llDeleteSubList(g_lMenuIDs, iMenuIndex - 1, iMenuIndex +3);  //remove stride from g_lMenuIDs
+            g_lMenuIDs = llDeleteSubList(g_lMenuIDs, iMenuIndex - 1, iMenuIndex +3);
         }
         else if (iNum == LM_SETTING_RESPONSE)
         {
@@ -396,7 +374,7 @@ default
             integer onlyver=0;
             if(sStr == "ver")onlyver=1;
             llInstantMessage(kID, llGetScriptName() +" SCRIPT VERSION: "+g_sScriptVersion+", APPVERSION: "+g_sAppVersion);
-            if(onlyver)return; // basically this command was: <prefix> versions
+            if(onlyver)return;
             DebugOutput(kID, [" HAS BELL PRIMS:", g_iHasBellPrims]);
             DebugOutput(kID, [" BELL VISIBLE:", g_iBellShow]);
             DebugOutput(kID, [" BELL ON:", g_iBellOn]);
@@ -442,7 +420,6 @@ default
             key toucher = llDetectedKey(0);
             if (toucher != g_kLastToucher || llGetTime() > g_fNextTouch)
             {
-                //one touch every 10 secounds is enough dude
                 g_fNextTouch = llGetTime()+10.0;
                 g_kLastToucher = toucher;
                 llPlaySound(g_kCurrentBellSound,g_fVolume);
