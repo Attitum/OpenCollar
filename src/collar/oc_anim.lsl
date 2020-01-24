@@ -82,9 +82,7 @@ Dialog(key kID, string sPrompt, list lChoices, list lUtilityButtons, integer iPa
 {
     key kMenuID = llGenerateKey();
     llMessageLinked(LINK_SET, DIALOG, (string)kID + "|" + sPrompt + "|" + (string)iPage + "|" + llDumpList2String(lChoices, "`") + "|" + llDumpList2String(lUtilityButtons, "`") + "|" + (string)iAuth, kMenuID);
-
     integer iIndex = llListFindList(g_lMenuIDs, [kID]);
-
     if (~iIndex) g_lMenuIDs = llListReplaceList(g_lMenuIDs, [kID, kMenuID, sName], iIndex, iIndex + g_iMenuStride - 1);
     else g_lMenuIDs += [kID, kMenuID, sName];  // We've not already given this user a menu. append to list
 }
@@ -107,15 +105,11 @@ AnimMenu(key kID, integer iAuth)
   sPrompt += "\n\n[ Main > Animations ]";
   list lButtons;
 
-  if (llGetInventoryType("~stiff") == INVENTORY_ANIMATION)
-  {
-    lButtons += Checkbox(g_bPosture, "Posture");
-  }
-  else
-    sPrompt += "\n\n\t[Error]\tAnimation > ~stiff is not found ...";
+  if (llGetInventoryType("~stiff") == INVENTORY_ANIMATION) lButtons += Checkbox(g_bPosture, "Posture");
+  else sPrompt += "\n\n\t[Error]\tAnimation > ~stiff is not found ...";
 
   lButtons += [Checkbox(g_bAnimLock, "AnimLock")];
-  lButtons += Checkbox(g_bTweakPoseAO, "AntiSlide");
+  lButtons += "> AntiSlide";
   lButtons += ["AO Menu", "AO ON", "AO OFF", "Pose"];
   Dialog(kID, sPrompt, lButtons + g_lAnimButtons, ["BACK"], 0, iAuth, "Anim");
 }
@@ -138,7 +132,6 @@ PoseMenu(key kID, integer iPage, integer iAuth)
         if ((float)sAdjustment > 0.0) sAdjustment = " (+" + llGetSubString(sAdjustment, 0, 3) + ")";
         else if ((float)sAdjustment < 0.0) sAdjustment = " (" + llGetSubString(sAdjustment, 0, 4) + ")";
         else sAdjustment = "";
-
         sActivePose = g_sCurrentPose + sAdjustment;
       }
     }
@@ -221,7 +214,6 @@ integer SetPosture(integer bOn, key kCommander)
     if (bOn && !g_bPosture)
     {
       llStartAnimation("~stiff");
-      //if (kCommander) llMessageLinked(LINK_SET, NOTIFY, "1" + "Posture override active.", kCommander);
       llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "posture=1","");
     }
     else if (!bOn)
@@ -267,7 +259,6 @@ StartAnim(string sAnim)
     if (llGetInventoryType(sAnim) == INVENTORY_ANIMATION)
     {
       if (llGetListLength(g_lAnims)) UnPlayAnim(llList2String(g_lAnims, 0));
-
       g_lAnims = [sAnim] + g_lAnims; // This way, g_lAnims[0] is always the currently playing anim
       PlayAnim(sAnim);
       MessageAOs("OFF", "STAND");
@@ -291,7 +282,7 @@ PlayAnim(string sAnim)
   if (g_bRLVaOn && g_bHoverOn)
   {
     integer iIndex = llListFindList(g_lHeightAdjustments, [sAnim]);
-    
+
     if (~iIndex) llMessageLinked(LINK_SET, RLV_CMD, "adjustheight:1;0;" + llList2String(g_lHeightAdjustments, iIndex + 1) + "=force", g_kWearer);
     else if (g_fStandHover) llMessageLinked(LINK_SET, RLV_CMD, "adjustheight:1;0;" + (string)g_fStandHover + "=force", g_kWearer);
   }
@@ -318,7 +309,7 @@ StopAnim(string sAnim)
 
 UnPlayAnim(string sAnim)
 {// Stops anim and heightfix, depending on methods configured for each
-  
+
   if (g_bTweakPoseAO && llGetAnimationOverride("Standing") != "") llResetAnimationOverride("ALL");
   if (g_bRLVaOn && g_bHoverOn) llMessageLinked(LINK_SET, RLV_CMD, "adjustheight:1;0;" + (string)g_fStandHover + "=force", g_kWearer);
 
@@ -392,8 +383,6 @@ UserCommand(integer iNum, string sStr, key kID)
         g_iLastPostureRank=iNum;
         SetPosture(TRUE, kID);
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "PostureRank=" + (string)g_iLastPostureRank, "");
-        //llMessageLinked(LINK_SET, NOTIFY, "0" + "Your neck is locked in place.", g_kWearer);
-
         if (kID != g_kWearer) llMessageLinked(LINK_SET, NOTIFY, "0" + "%WEARERNAME%'s neck is locked in place.", kID);
       }
       else llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to change posture", kID);
@@ -405,8 +394,6 @@ UserCommand(integer iNum, string sStr, key kID)
         g_iLastPostureRank = CMD_EVERYONE;
         SetPosture(FALSE, kID);
         llMessageLinked(LINK_SET, LM_SETTING_DELETE, g_sSettingToken + "PostureRank", "");
-        //llMessageLinked(LINK_SET, NOTIFY, "0" + "You can move your neck again.", g_kWearer);
-
         if (kID != g_kWearer) llMessageLinked(LINK_SET, NOTIFY, "0" + "%WEARERNAME% is free to move their neck.", kID);
       }
       else llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to change posture", kID);
@@ -422,7 +409,6 @@ UserCommand(integer iNum, string sStr, key kID)
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "PoselockRank=" + (string)g_iLastPoselockRank, "");
         g_bAnimLock = TRUE;
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "animlock=1", "");
-
         if (kID != g_kWearer) llMessageLinked(LINK_SET, NOTIFY, "0" + "%WEARERNAME% can have their poses changed or stopped only by owners.", kID);
       }
       else llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to change animlock", kID);
@@ -434,7 +420,6 @@ UserCommand(integer iNum, string sStr, key kID)
         g_bAnimLock = FALSE;
         llMessageLinked(LINK_SET, LM_SETTING_DELETE, g_sSettingToken + "animlock", "");
         llMessageLinked(LINK_SET, LM_SETTING_DELETE, g_sSettingToken + "PoselockRank", "");
-
         if (kID != g_kWearer) llMessageLinked(LINK_SET, NOTIFY, "0" + "%WEARERNAME% is free to change or stop poses on their own.", kID);
       }
       else llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to change animlock", kID);
@@ -499,10 +484,7 @@ UserCommand(integer iNum, string sStr, key kID)
       StartAnim(g_sCurrentPose);
       llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "currentpose=" + g_sCurrentPose + "," + (string)g_iLastRank, "");
     }
-    else
-    {
-      llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to change pose", kID);
-    }
+    else llMessageLinked(LINK_SET, NOTIFY, "0" + "%NOACCESS% to change pose", kID);
   }
 }
 
@@ -550,11 +532,8 @@ default
   state_entry()
   {
     if (llGetStartParameter() != 0) state inUpdate;
-
     g_kWearer = llGetOwner();
-
     if (llGetAttached()) llRequestPermissions(g_kWearer, PERMISSION_TRIGGER_ANIMATION | PERMISSION_OVERRIDE_ANIMATIONS);
-
     CreateAnimList();
     SearchIndicators();
   }
@@ -588,11 +567,7 @@ default
       if (llSubStringIndex(sStr, "Animations|") == 0)
       {
         string sChild = llList2String(llParseString2List(sStr, ["|"], []), 1);
-
-        if (llListFindList(g_lAnimButtons, [sChild]) == -1)
-        {
-          g_lAnimButtons += sChild;
-        }
+        if (llListFindList(g_lAnimButtons, [sChild]) == -1) g_lAnimButtons += sChild;
       }
     }
     else if (iNum == CMD_SAFEWORD)
@@ -637,10 +612,7 @@ default
         else if (sToken == "PoselockRank") g_iLastPoselockRank = (integer)sValue;
         else if (sToken == "TweakPoseAO")
         {
-          if (llGetAnimationOverride("Standing") != "")
-          {
-            g_bTweakPoseAO = (integer)sValue;
-          }
+          if (llGetAnimationOverride("Standing") != "") g_bTweakPoseAO = (integer)sValue;
         }
       }
       else if (llGetSubString(sToken, 0, i) == "offset_")
@@ -660,7 +632,6 @@ default
       else if(llToLower(llGetSubString(sToken,0,i)) == "global_")
       {
         sToken = llGetSubString(sToken, i+1,-1);
-
         if(sToken == "checkboxes") g_lCheckboxes = llCSV2List(sValue);
       }
     }
@@ -837,10 +808,7 @@ default
     if (iChange & CHANGED_TELEPORT) RefreshAnim();
     if (iChange & CHANGED_INVENTORY)
     {// Start re-reading the ~heightscalars notecard
-      if (g_iNumberOfAnims != llGetInventoryNumber(INVENTORY_ANIMATION))
-      {
-        CreateAnimList();
-      }
+      if (g_iNumberOfAnims != llGetInventoryNumber(INVENTORY_ANIMATION)) CreateAnimList();
     }
   }
 }
@@ -882,10 +850,7 @@ state inUpdate
               i=-1;
               end=llGetInventoryNumber(INVENTORY_ALL);
             }
-            else
-            {
-              llOwnerSay("Item '"+item+"' is no-copy and can not be moved! Please move it manually!");
-            }
+            else llOwnerSay("Item '"+item+"' is no-copy and can not be moved! Please move it manually!");
           }
         }
         llRemoveInventory(llGetScriptName());
