@@ -40,7 +40,7 @@ integer RLVA_VERSION          = 6004;
 integer ANIM_START            = 7000;
 integer ANIM_STOP             = 7001;
 integer ANIM_LIST_REQUEST     = 7002;
-integer ANIM_LIST_RESPONSE    =7003;
+integer ANIM_LIST_RESPONSE    = 7003;
 integer DIALOG                = -9000;
 integer DIALOG_RESPONSE       = -9001;
 integer DIALOG_TIMEOUT        = -9002;
@@ -107,8 +107,14 @@ AnimMenu(key kID, integer iAuth)
   sPrompt += "\n\n[ Main > Animations ]";
   list lButtons;
 
+  if (llGetInventoryType("~stiff") == INVENTORY_ANIMATION)
+  {
+    lButtons += Checkbox(g_bPosture, "Posture");
+  }
+  else
+    sPrompt += "\n\n\t[Error]\tAnimation > ~stiff is not found ...";
+
   lButtons += [Checkbox(g_bAnimLock, "AnimLock")];
-  lButtons += Checkbox(g_bPosture, "Posture");
   lButtons += Checkbox(g_bTweakPoseAO, "AntiSlide");
   lButtons += ["AO Menu", "AO ON", "AO OFF", "Pose"];
   Dialog(kID, sPrompt, lButtons + g_lAnimButtons, ["BACK"], 0, iAuth, "Anim");
@@ -215,7 +221,7 @@ integer SetPosture(integer bOn, key kCommander)
     if (bOn && !g_bPosture)
     {
       llStartAnimation("~stiff");
-      if (kCommander) llMessageLinked(LINK_SET, NOTIFY, "1" + "Posture override active.", kCommander);
+      //if (kCommander) llMessageLinked(LINK_SET, NOTIFY, "1" + "Posture override active.", kCommander);
       llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "posture=1","");
     }
     else if (!bOn)
@@ -386,7 +392,7 @@ UserCommand(integer iNum, string sStr, key kID)
         g_iLastPostureRank=iNum;
         SetPosture(TRUE, kID);
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "PostureRank=" + (string)g_iLastPostureRank, "");
-        llMessageLinked(LINK_SET, NOTIFY, "0" + "Your neck is locked in place.", g_kWearer);
+        //llMessageLinked(LINK_SET, NOTIFY, "0" + "Your neck is locked in place.", g_kWearer);
 
         if (kID != g_kWearer) llMessageLinked(LINK_SET, NOTIFY, "0" + "%WEARERNAME%'s neck is locked in place.", kID);
       }
@@ -399,7 +405,7 @@ UserCommand(integer iNum, string sStr, key kID)
         g_iLastPostureRank = CMD_EVERYONE;
         SetPosture(FALSE, kID);
         llMessageLinked(LINK_SET, LM_SETTING_DELETE, g_sSettingToken + "PostureRank", "");
-        llMessageLinked(LINK_SET, NOTIFY, "0" + "You can move your neck again.", g_kWearer);
+        //llMessageLinked(LINK_SET, NOTIFY, "0" + "You can move your neck again.", g_kWearer);
 
         if (kID != g_kWearer) llMessageLinked(LINK_SET, NOTIFY, "0" + "%WEARERNAME% is free to move their neck.", kID);
       }
