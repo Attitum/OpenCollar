@@ -69,8 +69,12 @@ Menu(key kID, integer iAuth)
 {
     string ON_OFF ;
     string sPrompt = "\n◼ On\n☐ Off";
+    list lButtons;
+
     sPrompt += "\n\n[ Main > Apps > Titler ]";
-    list lButtons = [Checkbox(g_iShow, "Show"),"Set Title", "Color","Move Up","Move Down"];
+
+    if(g_iShow) lButtons += [Checkbox(g_iShow, "Show"),"Set Title", "Color","Move Up","Move Down"];
+    else lButtons += [Checkbox(g_iShow, "Show")];
     Dialog(kID, sPrompt, lButtons, [UPMENU], 0, iAuth, "Menu~Titler");
 }
 
@@ -108,7 +112,7 @@ UserCommand(integer iNum, string sStr, key kID)
         if(sChangevalue == "title")
         {
             g_sTitle = llList2String(llList2List(llParseString2List(sStr,[" "],[]), 2,-1),0);
-            
+
             if(g_sTitle == "") Dialog(kID, "What should the title say?", [], [], 0, iNum, "Textbox~Title");
             Save();
         }
