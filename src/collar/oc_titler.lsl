@@ -92,13 +92,6 @@ UserCommand(integer iNum, string sStr, key kID)
 {
     if (iNum<CMD_OWNER || iNum>CMD_WEARER) return;
     if (llSubStringIndex(sStr,llToLower(g_sSubMenu)) && sStr != "menu "+g_sSubMenu) return;
-
-    //if (iNum == CMD_OWNER && sStr == "runaway")
-    //{
-        //g_lOwner = g_lTrust = g_lBlock = [];
-        //return;
-    //}
-
     if (sStr==g_sSubMenu || sStr == "menu "+g_sSubMenu) Menu(kID, iNum);
     else
     {
@@ -112,7 +105,6 @@ UserCommand(integer iNum, string sStr, key kID)
         if(sChangevalue == "title")
         {
             g_sTitle = llList2String(llList2List(llParseString2List(sStr,[" "],[]), 2,-1),0);
-
             if(g_sTitle == "") Dialog(kID, "What should the title say?", [], [], 0, iNum, "Textbox~Title");
             Save();
         }
@@ -294,7 +286,7 @@ default
                         Dialog(kAv, "What are the RGB values to set the color to? \n \n(Example: <1,0,0> = red)", [], [], 0, iAuth, "Textbox~Color");
                         iRespring=FALSE;
                     }
-                    if(iRespring)ColorMenu(kAv,iAuth);
+                    if(iRespring) ColorMenu(kAv,iAuth);
                     Save();
                 }
                 else if(sMenu == "Textbox~Title")
@@ -315,6 +307,7 @@ default
         {
             // Detect here the Settings
             list lSettings = llParseString2List(sStr, ["_","="],[]);
+            
             if(llList2String(lSettings,0)=="global")
             {
                 if(llList2String(lSettings,1)=="locked") g_iLocked=llList2Integer(lSettings,2);
