@@ -93,11 +93,11 @@ UserCommand(integer iNum, string sStr, key kID)
     if (iNum<CMD_OWNER || iNum>CMD_WEARER) return;
     if (llSubStringIndex(sStr,llToLower(g_sSubMenu)) && sStr != "menu "+g_sSubMenu) return;
 
-    if (iNum == CMD_OWNER && sStr == "runaway")
-    {
-        g_lOwner = g_lTrust = g_lBlock = [];
-        return;
-    }
+    //if (iNum == CMD_OWNER && sStr == "runaway")
+    //{
+        //g_lOwner = g_lTrust = g_lBlock = [];
+        //return;
+    //}
 
     if (sStr==g_sSubMenu || sStr == "menu "+g_sSubMenu) Menu(kID, iNum);
     else
