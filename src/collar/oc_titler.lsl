@@ -70,7 +70,7 @@ Menu(key kID, integer iAuth)
     string ON_OFF ;
     string sPrompt = "\n◼ On\n☐ Off";
     sPrompt += "\n\n[ Main > Apps > Titler ]";
-    list lButtons = ["UP","DOWN", "Set Title", "Color", Checkbox(g_iShow, "Show")];
+    list lButtons = [Checkbox(g_iShow, "Show"),"Set Title", "Color","Move Up","Move Down"];
     Dialog(kID, sPrompt, lButtons, [UPMENU], 0, iAuth, "Menu~Titler");
 }
 
@@ -127,12 +127,12 @@ UserCommand(integer iNum, string sStr, key kID)
             g_iShow=FALSE;
             Save();
         }
-        else if(sChangevalue == "up")
+        else if(sChangevalue == "move up")
         {
             g_iOffset++;
             Save();
         }
-        else if(sChangevalue == "down")
+        else if(sChangevalue == "move down")
         {
             g_iOffset--;
             if(g_iOffset<0)g_iOffset=0;
@@ -243,12 +243,12 @@ default
                         iRespring=FALSE;
                         llMessageLinked(LINK_SET, iAuth, "menu "+g_sParentMenu, kAv);
                     }
-                    else if(sMsg == "UP")
+                    else if(sMsg == "Move Up")
                     {
                         g_iOffset++;
                         Save();
                     }
-                    else if(sMsg == "DOWN")
+                    else if(sMsg == "Move Down")
                     {
                         g_iOffset--;
                         if(g_iOffset<0)g_iOffset=0;
