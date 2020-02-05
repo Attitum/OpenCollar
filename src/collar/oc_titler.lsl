@@ -67,14 +67,18 @@ Dialog(key kID, string sPrompt, list lChoices, list lUtilityButtons, integer iPa
 
 Menu(key kID, integer iAuth)
 {
-    string sPrompt = "\n[Titler]";
+    string ON_OFF ;
+    string sPrompt = "\n◼ On\n☐ Off";
+    sPrompt += "\n\n[ Main > Apps > Titler ]";
     list lButtons = ["UP","DOWN", "Set Title", "Color", Checkbox(g_iShow, "Show")];
     Dialog(kID, sPrompt, lButtons, [UPMENU], 0, iAuth, "Menu~Titler");
 }
 
 ColorMenu(key kAv, integer iAuth)
 {
-    string sPrompt = "\n[Titler]\nColor selection";
+    string ON_OFF ;
+    string sPrompt = "\n◼ On\n☐ Off";
+    sPrompt += "\n\n[ Main > Apps > Titler > Color ]";
     list lButtons = ["White", "Green", "Yellow", "Cyan", "Blue", "Pink", "Orange"];
     Dialog(kAv, sPrompt, lButtons, [UPMENU, "Custom"], 0, iAuth, "Menu~Colors");
 }
