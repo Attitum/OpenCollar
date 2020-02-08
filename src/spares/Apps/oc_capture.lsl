@@ -70,6 +70,7 @@ Menu(key kID, integer iAuth)
 {
     string sPrompt = "\n◼ On\n☐ Off";
     sPrompt += "\n\n[ Main > Apps > Capture ]";
+    list lButtons;
 
     if (g_iEnabled) lButtons += [Checkbox(g_iEnabled,"Enabled"), Checkbox(g_iRisky, "Risky"), Checkbox(g_iAutoRelease, "Timed")];
     else lButtons += [Checkbox(g_iEnabled,"Enabled")];
