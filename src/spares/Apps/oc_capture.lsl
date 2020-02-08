@@ -70,7 +70,9 @@ Menu(key kID, integer iAuth)
 {
     string sPrompt = "\n◼ On\n☐ Off";
     sPrompt += "\n\n[ Main > Apps > Capture ]";
-    list lButtons = [Checkbox(g_iEnabled,"Enabled"), Checkbox(g_iRisky, "Risky"), Checkbox(g_iAutoRelease, "Timed")];
+
+    if (g_iEnabled) list lButtons = [Checkbox(g_iEnabled,"Enabled"), Checkbox(g_iRisky, "Risky"), Checkbox(g_iAutoRelease, "Timed")];
+    else list lButtons = [Checkbox(g_iEnabled,"Enabled")];
     Dialog(kID, sPrompt, lButtons, [UPMENU], 0, iAuth, "Menu~Main");
 }
 
@@ -231,7 +233,7 @@ Commit()
     {
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, "auth_tempowner="+(string)g_kCaptor,"");
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, "capture_isActive=1", ""); // <--- REMOVE AFTER NEXT RELEASE. This is here only for 7.3 compatibility
-        
+
         if (g_iAutoRelease)
         {
             g_iReleaseTime = 0;
