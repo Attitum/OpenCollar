@@ -73,16 +73,16 @@ DoMenu(key kID, integer iAuth)
 {
     string sPrompt;
     key kMenuID = llGenerateKey();
-    
+
     sPrompt = "\n[ Main > rlv ]";
     //string sPrompt = "\n[Remote Scripted Viewer Controls]\n";
-/*    
+/*
     if (g_iRlvActive)
     {
         if (g_iRlvVersion) sPrompt += "\nRestrainedLove API: RLV v"+g_sRlvVersionString;
         if (g_iRlvaVersion) sPrompt += " / RLVa v"+g_sRlvaVersionString;
     }
-*/    
+*/
     if (g_iRLVOff) sPrompt += "\n\n\t[Error]\tRLV is Disabled";
     else
     {
@@ -279,10 +279,7 @@ UserCommand(integer iNum, string sStr, key kID)
         llSleep(2);
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, g_sSettingToken + "on="+(string)g_iRLVOn, "");
     }
-    else if (sStr == "rlv" || sStr == "menu rlv" )
-    {
-        DoMenu(kID, iNum);
-    }
+    else if (sStr == "rlv" || sStr == "menu rlv" ) DoMenu(kID, iNum);
     else if (sStr == "rlv on")
     {
         llMessageLinked(LINK_SET,NOTIFY,"0"+"Starting RLV...",g_kWearer);
@@ -332,10 +329,8 @@ UserCommand(integer iNum, string sStr, key kID)
         while (numRestrictions)
         {
             key kSource=(key)llList2String(g_lRestrictions,numRestrictions-2);
-            if ((key)kSource)
-                sOut+="\n"+llKey2Name((key)kSource)+" ("+(string)kSource+"): "+llList2String(g_lRestrictions,numRestrictions-1)+"\n";
-            else
-                sOut+="\nThis %DEVICETYPE% ("+(string)kSource+"): "+llList2String(g_lRestrictions,numRestrictions-1)+"\n";
+            if ((key)kSource) sOut+="\n"+llKey2Name((key)kSource)+" ("+(string)kSource+"): "+llList2String(g_lRestrictions,numRestrictions-1)+"\n";
+            else sOut+="\nThis %DEVICETYPE% ("+(string)kSource+"): "+llList2String(g_lRestrictions,numRestrictions-1)+"\n";
             numRestrictions -= 2;
         }
         llMessageLinked(LINK_SET,NOTIFY,"0"+sOut,kID);
@@ -369,12 +364,9 @@ SearchIndicators()
 
 Indicator(integer iMode)
 {
-    if(iMode)
-        llSetLinkPrimitiveParamsFast(INDICATOR_THIS,[PRIM_FULLBRIGHT,ALL_SIDES,TRUE,PRIM_BUMP_SHINY,ALL_SIDES,PRIM_SHINY_NONE,PRIM_BUMP_NONE,PRIM_GLOW,ALL_SIDES,0.4]);
-    else
-        llSetLinkPrimitiveParamsFast(INDICATOR_THIS,[PRIM_FULLBRIGHT,ALL_SIDES,FALSE,PRIM_BUMP_SHINY,ALL_SIDES,PRIM_SHINY_HIGH,PRIM_BUMP_NONE,PRIM_GLOW,ALL_SIDES,0.0]);
+    if(iMode) llSetLinkPrimitiveParamsFast(INDICATOR_THIS,[PRIM_FULLBRIGHT,ALL_SIDES,TRUE,PRIM_BUMP_SHINY,ALL_SIDES,PRIM_SHINY_NONE,PRIM_BUMP_NONE,PRIM_GLOW,ALL_SIDES,0.4]);
+    else llSetLinkPrimitiveParamsFast(INDICATOR_THIS,[PRIM_FULLBRIGHT,ALL_SIDES,FALSE,PRIM_BUMP_SHINY,ALL_SIDES,PRIM_SHINY_HIGH,PRIM_BUMP_NONE,PRIM_GLOW,ALL_SIDES,0.0]);
 }
-
 
 default
 {
@@ -388,10 +380,7 @@ default
 
     state_entry()
     {
-        if (llGetStartParameter()!=0)
-        {
-            state inUpdate;
-        }
+        if (llGetStartParameter()!=0) state inUpdate;
         setRlvState();
         llOwnerSay("@clear");
         g_kWearer = llGetOwner();
@@ -442,10 +431,7 @@ default
 
                 if (sMenu == g_sSubMenu)
                 {
-                    if (sMsg == TURNON)
-                    {
-                        UserCommand(iAuth, "rlv on", kAv);
-                    }
+                    if (sMsg == TURNON) UserCommand(iAuth, "rlv on", kAv);
                     else if (sMsg == TURNOFF)
                     {
                         UserCommand(iAuth, "rlv off", kAv);
@@ -456,14 +442,8 @@ default
                         UserCommand(iAuth, "clear", kAv);
                         DoMenu(kAv, iAuth);
                     }
-                    else if (sMsg == UPMENU)
-                    {
-                        llMessageLinked(LINK_SET, iAuth, "menu "+g_sParentMenu, kAv);
-                    }
-                    else if (~llListFindList(g_lMenu, [sMsg]))
-                    {
-                        llMessageLinked(LINK_SET, iAuth, "menu " + sMsg, kAv);
-                    }
+                    else if (sMsg == UPMENU) llMessageLinked(LINK_SET, iAuth, "menu "+g_sParentMenu, kAv);
+                    else if (~llListFindList(g_lMenu, [sMsg])) llMessageLinked(LINK_SET, iAuth, "menu " + sMsg, kAv);
                 }
             }
         }
@@ -511,10 +491,7 @@ default
             lParams=[];
             if (sThisParent == g_sSubMenu)
             {
-                if (! ~llListFindList(g_lMenu, [sChild]))
-                {
-                    g_lMenu += [sChild];
-                }
+                if (! ~llListFindList(g_lMenu, [sChild])) g_lMenu += [sChild];
             }
         }
         else if (iNum == MENUNAME_REMOVE)
@@ -527,10 +504,7 @@ default
             if (sThisParent == g_sSubMenu)
             {
                 integer iIndex = llListFindList(g_lMenu, [sChild]);
-                if (iIndex != -1)
-                {
-                    g_lMenu = llDeleteSubList(g_lMenu, iIndex, iIndex);
-                }
+                if (iIndex != -1) g_lMenu = llDeleteSubList(g_lMenu, iIndex, iIndex);
             }
         }
         else if (iNum == LOADPIN && sStr == llGetScriptName())
@@ -561,10 +535,7 @@ default
                     else if (sCom=="clear")
                     {
                         integer iSource=llListFindList(g_lRestrictions,[kID]);
-                        if (kID=="rlvex")
-                        {
-                            RemRestriction(kID,sVal);
-                        }
+                        if (kID=="rlvex") RemRestriction(kID,sVal);
                         else if (~iSource)
                         {
                             list lSrcRestr=llParseString2List(llList2String(g_lRestrictions,iSource+1),["§"],[]);
@@ -573,10 +544,7 @@ default
                             while (llGetListLength(lSrcRestr))
                             {
                                 string  sBehav=llList2String(lSrcRestr,-1);
-                                if (sVal=="" || llSubStringIndex(sBehav,sVal)!=-1)
-                                {
-                                    lRestrictionsToRemove+=sBehav;
-                                }
+                                if (sVal=="" || llSubStringIndex(sBehav,sVal)!=-1) lRestrictionsToRemove+=sBehav;
                                 lSrcRestr=llDeleteSubList(lSrcRestr,-1,-1);
                             }
                             lSrcRestr=[];
@@ -620,7 +588,7 @@ default
             {
                 if (llGetSubString(sStr,-43,-1)== ","+(string)g_kWearer+",!pong")
                 {
-                    if (kID==g_kSitter) llOwnerSay("@"+"sit:"+(string)g_kSitTarget+"=force");  //if we stored a sitter, sit on it
+                    if (kID==g_kSitter) llOwnerSay("@"+"sit:"+(string)g_kSitTarget+"=force");
                     rebakeSourceRestrictions(kID);
                 }
             }
@@ -652,8 +620,7 @@ default
                 g_iWaitRelay = 2;
                 llMessageLinked(LINK_SET, RLV_ON, "", NULL_KEY);
                 llMessageLinked(LINK_SET, RLV_VERSION, (string)g_iRlvVersion, "");
-                if (g_iRlvaVersion)
-                    llMessageLinked(LINK_SET, RLVA_VERSION, (string)g_iRlvaVersion, "");
+                if (g_iRlvaVersion) llMessageLinked(LINK_SET, RLVA_VERSION, (string)g_iRlvaVersion, "");
                 DoLock();
                 llSetTimerEvent(3.0);
             }
@@ -674,10 +641,7 @@ default
         }
         else
         {
-            if (g_iCheckCount++ < g_iMaxViewerChecks)
-            {
-                llOwnerSay("@versionnew=293847");
-            }
+            if (g_iCheckCount++ < g_iMaxViewerChecks) llOwnerSay("@versionnew=293847");
             else
             {
                 llMessageLinked(LINK_SET, NOTIFY, "0"+"\n\nRLV appears to be not currently activated in your viewer. There will be no further attempted handshakes \"@versionnew=293847\" until the next time you log in. To permanently turn RLV off, type \"/%CHANNEL% %PREFIX% rlv off\" but keep in mind that you will have to manually enable it if you wish to use it in the future.\n", g_kWearer);
@@ -698,10 +662,7 @@ default
         if (iChange & CHANGED_TELEPORT || iChange & CHANGED_REGION)
         {
             integer numBaked=llGetListLength(g_lBaked);
-            while (numBaked--)
-            {
-                llOwnerSay("@"+llList2String(g_lBaked,numBaked)+"=n");
-            }
+            while (numBaked--) llOwnerSay("@"+llList2String(g_lBaked,numBaked)+"=n");
         }
     }
 }
@@ -727,10 +688,7 @@ state inUpdate
                 {
                     string item = llGetInventoryName(INVENTORY_ALL,i);
 
-                    if(llGetInventoryType(item)==INVENTORY_SCRIPT && item!=llGetScriptName())
-                    {
-                        llRemoveInventory(item);
-                    }
+                    if(llGetInventoryType(item)==INVENTORY_SCRIPT && item!=llGetScriptName()) llRemoveInventory(item);
                     else if(llGetInventoryType(item)!=INVENTORY_SCRIPT)
                     {
                         llGiveInventory(kID, item);
