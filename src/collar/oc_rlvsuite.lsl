@@ -4,6 +4,8 @@ string g_sScriptVersion         = "7.4";
 string g_sParentMenu            = "RLV";
 string g_sSubMenu               = "Restrictions";
 string g_sSettingToken          = "rlvsuite_";
+string g_sTmpMacroName          = "";
+string g_sTmpRestName           = "";
 
 integer CMD_OWNER               = 500;
 integer CMD_TRUSTED             = 501;
@@ -33,25 +35,19 @@ integer DIALOG                  = -9000;
 integer DIALOG_RESPONSE         = -9001;
 integer g_iRestrictions1        = 0;
 integer g_iRestrictions2        = 0;
+integer g_lMaxMacros            = 10;       // Maximum number of Macros allowed
+integer g_iBlurAmount           = 5;
+integer g_bForceMouselook       = FALSE;
+integer g_iRLV                  = FALSE;
+integer g_iMenuStride;
 
-list g_lMaskData = ["Owner", 1, "Trusted", 2, "Group", 4, "Everyone", 8]; //<- todo: add CMD_OWNER, etc to this to allow the isAuthed function to use a one liner to return true or false.
-
-integer bool(integer a)
-{
-    if(a)return TRUE;
-    else return FALSE;
-}
+float g_fMaxCamDist         = 2.0;
+float g_fMinCamDist         = 1.0;
 
 list g_lCheckboxes=["⬜","⬛"];
-string Checkbox(integer iValue, string sLabel)
-{
-    return llList2String(g_lCheckboxes, bool(iValue))+" "+sLabel;
-}
-
+list g_lMaskData = ["Owner", 1, "Trusted", 2, "Group", 4, "Everyone", 8]; //<- todo: add CMD_OWNER, etc to this to allow the isAuthed function to use a one liner to return true or false.
+list g_lMenuIDs;
 list g_lMacros                  = ["Hear", 4, 0, "Talk" , 2, 0, "Touch", 0, 16384, "Stray", 29360128, 524288, "Rummage", 1342179328, 131168, "Dress", 0, 15, "IM", 384, 0, "Daze", 323584, 0, "Dazzle", 0, 16777216];
-integer g_lMaxMacros            = 10; // Maximum number of Macros allowed
-string g_sTmpMacroName          = "";
-string g_sTmpRestName           = "";
 list g_lCategory                = ["Chat","Show/Hide","Teleport","Misc","Edit/Mod","Interact","Movement","Camera","Outfit"];
 list g_lUtilityMain             = ["> Singles","> Create","BACK"];
 list g_lUtilityNone             = ["BACK"];
@@ -121,15 +117,17 @@ list g_lRLVList                 = [
 //  "Mouselook"     , 7 , "camdistmax:0"                        , 0         , 67108864  , CMD_EVERYONE     // 62
 ];
 
-integer g_iBlurAmount       = 5;
-integer g_bForceMouselook   = FALSE;
-integer g_iRLV              = FALSE;
-integer g_iMenuStride;
 
-float g_fMaxCamDist         = 2.0;
-float g_fMinCamDist         = 1.0;
+integer bool(integer a)
+{
+    if(a)return TRUE;
+    else return FALSE;
+}
 
-list g_lMenuIDs;
+string Checkbox(integer iValue, string sLabel)
+{
+    return llList2String(g_lCheckboxes, bool(iValue))+" "+sLabel;
+}
 
 Dialog(key kID, string sPrompt, list lChoices, list lUtilityButtons, integer iPage, integer iAuth, string sName)
 {
