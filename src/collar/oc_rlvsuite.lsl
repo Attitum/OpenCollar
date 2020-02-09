@@ -53,7 +53,7 @@ integer g_lMaxMacros            = 10; // Maximum number of Macros allowed
 string g_sTmpMacroName          = "";
 string g_sTmpRestName           = "";
 list g_lCategory                = ["Chat","Show/Hide","Teleport","Misc","Edit/Mod","Interact","Movement","Camera","Outfit"];
-list g_lUtilityMain             = ["[Individual]","[Manage]","BACK"];
+list g_lUtilityMain             = ["> Singles","> Create","BACK"];
 list g_lUtilityNone             = ["BACK"];
 list g_lRLVList                 = [
     // ButtonText, CategoryIndex, RLVCMD, Auth
@@ -121,13 +121,13 @@ list g_lRLVList                 = [
 //  "Mouselook"     , 7 , "camdistmax:0"                        , 0         , 67108864  , CMD_EVERYONE     // 62
 ];
 
-integer g_iBlurAmount     = 5;
-integer g_bForceMouselook = FALSE;
-integer g_iRLV            = FALSE;
+integer g_iBlurAmount       = 5;
+integer g_bForceMouselook   = FALSE;
+integer g_iRLV              = FALSE;
 integer g_iMenuStride;
 
-float g_fMaxCamDist       = 2.0;
-float g_fMinCamDist       = 1.0;
+float g_fMaxCamDist         = 2.0;
+float g_fMinCamDist         = 1.0;
 
 list g_lMenuIDs;
 
@@ -135,7 +135,6 @@ Dialog(key kID, string sPrompt, list lChoices, list lUtilityButtons, integer iPa
 {
     key kMenuID = llGenerateKey();
     llMessageLinked(LINK_SET, DIALOG, (string)kID + "|" + sPrompt + "|" + (string)iPage + "|" + llDumpList2String(lChoices, "`") + "|" + llDumpList2String(lUtilityButtons, "`") + "|" + (string)iAuth, kMenuID);
-
     integer iIndex = llListFindList(g_lMenuIDs, [kID]);
     if (~iIndex) g_lMenuIDs = llListReplaceList(g_lMenuIDs, [kID, kMenuID, sName], iIndex, iIndex + g_iMenuStride - 1);
     else g_lMenuIDs += [kID, kMenuID, sName];
@@ -206,6 +205,7 @@ MenuSetAccess(key kID, integer iAuth, string sCommand)
 {
     list lButtons = [];
     integer iIndex = llListFindList(g_lRLVList,[sCommand]);
+
     if (iIndex > -1)
     {
         g_sTmpRestName = sCommand;
@@ -217,14 +217,11 @@ MenuSetAccess(key kID, integer iAuth, string sCommand)
 
 MenuDelete(key kID, integer iAuth)
 {
-    if (iAuth == CMD_OWNER || iAuth == CMD_WEARER){
+    if (iAuth == CMD_OWNER || iAuth == CMD_WEARER)
+    {
         list lButtons = [];
         integer i;
-
-        for (i=0; i<llGetListLength(g_lMacros);i=i+3)
-        {
-            lButtons += llList2String(g_lMacros,i);
-        }
+        for (i=0; i<llGetListLength(g_lMacros);i=i+3) lButtons += llList2String(g_lMacros,i);
         Dialog(kID, "Select a Macro you want to delete:", lButtons, g_lUtilityNone, 0, iAuth, "Restrictions~Delete");
     }
     else
@@ -238,15 +235,8 @@ list bitpos (integer flag1,integer flag2)
 {
     list ret=[0,0];
 
-    if(flag1>0)
-    {
-        ret=llListReplaceList(ret,[llRound(llLog10(flag1)/llLog10(2))],0,0);
-    }
-
-    if(flag2>0)
-    {
-        ret = llListReplaceList(ret,[llRound(llLog10(flag2)/llLog10(2))],1,1);
-    }
+    if(flag1>0) ret=llListReplaceList(ret,[llRound(llLog10(flag1)/llLog10(2))],0,0);
+    if(flag2>0) ret = llListReplaceList(ret,[llRound(llLog10(flag2)/llLog10(2))],1,1);
     return ret;
 }
 integer isAuthed(integer Flag, integer iAuth)
@@ -299,18 +289,9 @@ string FormatCommand(string sCommand,integer bEnable)
         if (bEnable) sMod = ":"+(string)g_iBlurAmount+"=force";
         else sMod = ":1=force";
     }
-    else if (sCommand == "setcam_avdistmax" && !g_bForceMouselook)
-    {
-        sCommand += ":"+(string)g_fMaxCamDist;
-    }
-    else if (sCommand == "setcam_avdistmin" && !g_bForceMouselook)
-    {
-        sCommand += ":"+(string)g_fMinCamDist;
-    }
-    else if ((sCommand == "setcam_avdistmax" || sCommand == "setcam_avdistmin") && g_bForceMouselook)
-    {
-        sCommand = "camdistmax:0";
-    }
+    else if (sCommand == "setcam_avdistmax" && !g_bForceMouselook) sCommand += ":"+(string)g_fMaxCamDist;
+    else if (sCommand == "setcam_avdistmin" && !g_bForceMouselook) sCommand += ":"+(string)g_fMinCamDist;
+    else if ((sCommand == "setcam_avdistmax" || sCommand == "setcam_avdistmin") && g_bForceMouselook) sCommand = "camdistmax:0";
     else if (sCommand == "camdistmax:0")
     {
         if (bEnable) g_bForceMouselook = TRUE;
@@ -329,21 +310,14 @@ ApplyAll(integer iMask1, integer iMask2, integer iBoot)
     {
         list pos = bitpos(iMax1, 0);
         integer iIndex = (llList2Integer(pos,0)*4)+2;
-
-        if (iIndex > -1 && bool(iMax1 & iMask1) != bool(iMax1 & g_iRestrictions1))
-        {
-            lResult += [FormatCommand(llList2String(g_lRLVList,iIndex), bool(iMax1 & iMask1))];
-        }
+        if (iIndex > -1 && bool(iMax1 & iMask1) != bool(iMax1 & g_iRestrictions1)) lResult += [FormatCommand(llList2String(g_lRLVList,iIndex), bool(iMax1 & iMask1))];
         iMax1 = iMax1 >> 1;
     }
     while (iMax2 > 0)
     {
         list pos = bitpos(0,iMax2);
         integer iIndex = ((llList2Integer(pos,1)+30)*4)+2;
-        if (iIndex > -1 && bool(iMax2 & iMask2) != bool(iMax2 & g_iRestrictions2))
-        {
-            lResult += [FormatCommand(llList2String(g_lRLVList,iIndex),bool(iMax2 & iMask2))];
-        }
+        if (iIndex > -1 && bool(iMax2 & iMask2) != bool(iMax2 & g_iRestrictions2)) lResult += [FormatCommand(llList2String(g_lRLVList,iIndex),bool(iMax2 & iMask2))];
         iMax2 = iMax2 >> 1;
     }
     string sCommandList = llDumpList2String(lResult,",");
@@ -351,11 +325,7 @@ ApplyAll(integer iMask1, integer iMask2, integer iBoot)
     llMessageLinked(LINK_SET,RLV_CMD,sCommandList,"Macros");
     g_iRestrictions1 = iMask1;
     g_iRestrictions2 = iMask2;
-
-    if(!iBoot)
-    {
-        llMessageLinked(LINK_SET, LM_SETTING_SAVE, "rlvsuite_masks=" + (string)g_iRestrictions1+","+(string)g_iRestrictions2, "");
-    }
+    if(!iBoot) llMessageLinked(LINK_SET, LM_SETTING_SAVE, "rlvsuite_masks=" + (string)g_iRestrictions1+","+(string)g_iRestrictions2, "");
 }
 
 ApplyCommand(string sCommand, integer iAdd,key kID, integer iAuth)
@@ -363,6 +333,7 @@ ApplyCommand(string sCommand, integer iAdd,key kID, integer iAuth)
     integer iMenuIndex = llListFindList(g_lRLVList,[sCommand]);
     integer iActualIndex=iMenuIndex;
     integer iMenuIndex2;
+
     if(iMenuIndex/4>=31)
     {
         iMenuIndex2 =(integer) llPow(2, (iMenuIndex/4)-30);
@@ -407,10 +378,7 @@ AuthSetting(string sAuthSetting)
     {
         integer i;
         list lAuthSetting;
-        for (i=3; i<llGetListLength(g_lRLVList);i+=4)
-        {
-            lAuthSetting += (string)(llList2Integer(g_lRLVList,i));
-        }
+        for (i=3; i<llGetListLength(g_lRLVList);i+=4) lAuthSetting += (string)(llList2Integer(g_lRLVList,i));
         llMessageLinked(LINK_SET, LM_SETTING_SAVE, "rlvsuite_auths="+llDumpList2String(lAuthSetting, "/"), "");
     }
     else
@@ -488,10 +456,7 @@ default
 
     link_message(integer iSender,integer iNum,string sStr,key kID){
         if(iNum >= CMD_OWNER && iNum <= CMD_EVERYONE) UserCommand(iNum, sStr, kID);
-        else if(iNum == MENUNAME_REQUEST && sStr == g_sParentMenu)
-        {
-            llMessageLinked(iSender, MENUNAME_RESPONSE, g_sParentMenu+"|"+ g_sSubMenu,"");
-        }
+        else if(iNum == MENUNAME_REQUEST && sStr == g_sParentMenu) llMessageLinked(iSender, MENUNAME_RESPONSE, g_sParentMenu+"|"+ g_sSubMenu,"");
         else if(iNum == DIALOG_RESPONSE)
         {
             integer iMenuIndex = llListFindList(g_lMenuIDs, [kID]);
@@ -507,11 +472,8 @@ default
                 if(sMenu == "Restrictions~Main")
                 {
                     if(sMsg == "BACK") llMessageLinked(LINK_SET, iAuth, "menu "+g_sParentMenu, kAv);
-                    else if (sMsg == "[Manage]") Dialog(kAv, "Select an Option:\n \nSave As: Save current restrictions into a Macro\nDelete: Delete a Macro", ["Save As","Delete"], g_lUtilityNone, 0, iAuth, "Restrictions~Manage");
-                    else if(sMsg == "[Individual]")
-                    {
-                       MenuRestrictions(kAv,iAuth,FALSE);
-                    }
+                    else if (sMsg == "> Create") Dialog(kAv, "Select an Option:\n \nSave As: Save current restrictions into a Macro\nDelete: Delete a Macro", ["Save As","Delete"], g_lUtilityNone, 0, iAuth, "Restrictions~Manage");
+                    else if(sMsg == "> Singles") MenuRestrictions(kAv,iAuth,FALSE);
                     else
                     {
                         integer iIndex = llListFindList(g_lMacros,[sMsg]);
@@ -526,10 +488,7 @@ default
                 {
                     if (sMsg == "Save As")
                     {
-                        if (iAuth == CMD_WEARER || iAuth == CMD_OWNER)
-                        {
-                            Dialog(kAv, "Enter the name of the new Macro:", [], [], 0, iAuth,"Restrictions~textbox");
-                        }
+                        if (iAuth == CMD_WEARER || iAuth == CMD_OWNER) Dialog(kAv, "Enter the name of the new Macro:", [], [], 0, iAuth,"Restrictions~textbox");
                         else
                         {
                             llMessageLinked(LINK_SET, NOTIFY, "0"+"%NOACCESS%", kAv);
@@ -585,10 +544,7 @@ default
                             iMenuIndex2 = (iMenuIndex/4)-30;
                             iMenuIndex=0;
                         }
-                        else
-                        {
-                            iMenuIndex /= 4;
-                        }
+                        else iMenuIndex /= 4;
 
                         if (iMenuIndex > -1)
                         {
@@ -597,10 +553,7 @@ default
                                 if (iAuth != CMD_WEARER) ApplyCommand(sMsg,FALSE,kAv, iAuth);
                                 else llMessageLinked(LINK_SET, NOTIFY, "0%NOACCESS%", kAv);
                             }
-                            else
-                            {
-                                ApplyCommand(sMsg,TRUE,kAv,iAuth);
-                            }
+                            else ApplyCommand(sMsg,TRUE,kAv,iAuth);
                             MenuCategory(kAv, iAuth, llList2String(g_lCategory, llList2Integer(g_lRLVList,llListFindList(g_lRLVList,[sMsg])+1)),FALSE);
                         }
                     }
@@ -626,16 +579,8 @@ default
                             integer mask = llList2Integer(g_lRLVList, iIndex+3);
                             integer ipos= llListFindList(g_lMaskData, [sLabel]);
                             integer maskData = llList2Integer(g_lMaskData, ipos+1);
-
-                            if(llGetSubString(sMsg,0,0) == llList2String(g_lCheckboxes,TRUE))
-                            {
-                                mask -= maskData;
-                            }
-                            else
-                            {
-                                mask += maskData;
-                            }
-
+                            if(llGetSubString(sMsg,0,0) == llList2String(g_lCheckboxes,TRUE)) mask -= maskData;
+                            else mask += maskData;
                             if(mask<0)mask=15;
                             if(!(mask&1))mask+=1;
                             g_lRLVList = llListReplaceList(g_lRLVList, [mask], iIndex+3, iIndex+3);
@@ -706,7 +651,7 @@ default
         }
         else if(iNum == -99999)
         {
-            if(sStr == "update_active")state inUpdate;
+            if(sStr == "update_active") state inUpdate;
         }
         else if (iNum == LM_SETTING_RESPONSE)
         {
@@ -746,10 +691,7 @@ default
             g_iRestrictions2 = 0;
             ApplyAll(iMask1,iMask2,TRUE);
         }
-        else if (iNum == REBOOT && sStr == "reboot")
-        {
-            llResetScript();
-        }
+        else if (iNum == REBOOT && sStr == "reboot") llResetScript();
         else if(iNum == LINK_CMD_DEBUG)
         {
             integer onlyver=0;
