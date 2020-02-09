@@ -4,8 +4,8 @@ string g_sScriptVersion         = "7.4";
 string g_sParentMenu            = "Main";
 string g_sSubMenu               = "RLV";
 string UPMENU                   = "BACK";
-string TURNON                   = "ON";
-string TURNOFF                  = "OFF";
+string TURNON                   = " ON";
+string TURNOFF                  = " OFF";
 string CLEAR                    = "CLEAR ALL";
 string g_sSettingToken          = "rlvsys_";
 string g_sGlobalToken           = "global_";
@@ -76,14 +76,13 @@ DoMenu(key kID, integer iAuth)
 
     sPrompt = "\n[ Main > rlv ]";
     //string sPrompt = "\n[Remote Scripted Viewer Controls]\n";
-/*
+
     if (g_iRlvActive)
     {
-        if (g_iRlvVersion) sPrompt += "\nRestrainedLove API: RLV v"+g_sRlvVersionString;
+        if (g_iRlvVersion) sPrompt += "\n\n\tRestrainedLove API: RLV v"+g_sRlvVersionString;
         if (g_iRlvaVersion) sPrompt += " / RLVa v"+g_sRlvaVersionString;
     }
-*/
-    if (g_iRLVOff) sPrompt += "\n\n\t[Error]\tRLV is Disabled";
+    else if (g_iRLVOff) sPrompt += "\n\n\t[Error]\tRLV is Disabled";
     else
     {
         if (g_iRLVOn) sPrompt += "\nThe rlv script is still trying to handshake with the RL-viewer. Just wait another minute and try again.\n\n[ON] restarts the RLV handshake cycle with the viewer.";
